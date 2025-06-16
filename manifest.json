@@ -1,0 +1,15 @@
+{
+  "name": "Stay Productive",
+  "description": "Keeps you productive",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["tabs", "webNavigation"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "hello_extensions.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["<all_urls>"]
+}
