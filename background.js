@@ -1,148 +1,180 @@
-// Convenience functions
-function executeScript(tabId, func) {
-  chrome.scripting.executeScript({ target: { tabId }, func });
-}
+function handleNavigation(details) {
 
-function updateTabUrl(tabId, url) {
-  chrome.tabs.update(tabId, { url });
-}
-
-// Edits HTML to remove YouTube Shorts recommendations
-function removeShortsFromYouTube() {
-  function removeShortsShelves() {
-    const selectors = ['ytd-reel-shelf-renderer', '[class*="ytd-rich-shelf-renderer"]'];
-    selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => el.remove()));
-  }
-  removeShortsShelves();
-  new MutationObserver(removeShortsShelves).observe(document.body, { childList: true, subtree: true });
-}
-
-// Edits HTML to remove YouTube video recommendations
-function removeFromYouTubeRecommended() {
-  function removeRecommended() {
-    document.querySelectorAll('[id*="related"]').forEach(el => el.remove());
-    if (location.hostname === "www.youtube.com" && location.pathname === "/") {
-      document.querySelectorAll('ytd-two-column-browse-results-renderer').forEach(el => el.remove());
-    }
-  }
-  removeRecommended();
-  new MutationObserver(removeRecommended).observe(document.body, { childList: true, subtree: true });
-}
-
-// Edits HTML to remove Instagram post recommendations
-function removeFromInstagramHome() {
-  function removeArticles() {
-    document.querySelectorAll('div').forEach(div => {
-      const articles = div.querySelectorAll('article');
-      if (articles.length >= 1) articles.forEach(article => article.remove());
-    });
-  }
-  removeArticles();
-  new MutationObserver(removeArticles).observe(document.body, { childList: true, subtree: true });
-}
-
-// Edits HTML to remove Twitter post recommendations
-function removeFromTwitter() {
-  function removeRecommended() {
-    const selectors = [
-      '[aria-labelledby*="accessible-list-0"]',
-      '[aria-labelledby*="accessible-list-1"]',
-      '[aria-labelledby*="accessible-list-2"]'
-    ];
-    selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => el.remove()));
-  }
-  removeRecommended();
-  new MutationObserver(removeRecommended).observe(document.body, { childList: true, subtree: true });
-}
-
-function handleMonitoring(details) {
-  const { url: href, tabId } = details;
-  const url = new URL(href);
+  const url = new URL(details.url);
   const domain = url.hostname;
 
-  // Block domains completely
   chrome.storage.sync.get("blockedDomains", ({ blockedDomains = [] }) => {
+
     if (blockedDomains.includes(domain)) {
-      executeScript(tabId, () => {
-        if (history.length > 1) history.back();
-        else window.close();
+      chrome.scripting.executeScript({
+        target: { tabId: details.tabId },
+        func: () => {
+          if (history.length > 1) {
+            history.back();
+          } else {
+            window.close();
+          }
+        }
       });
     }
   });
 
-  // Protects against scrolling
-  chrome.storage.sync.get(["noScrolling", "blockedDomains"], ({ noScrolling = [], blockedDomains = [] }) => {
-    if (!noScrolling.includes(domain) || blockedDomains.includes(domain)) return;
+  chrome.storage.sync.get("noScrolling", ({ noScrolling = [] }) => {
+    const url = new URL(details.url);
+    const domain = url.hostname;
 
-    if (href.includes("www.youtube.com/shorts/")) {
-      const id = href.split("shorts/")[1];
-      updateTabUrl(tabId, `https://www.youtube.com/watch?v=${id}`);
-    }
+    if (noScrolling.includes(domain)) {
+      if (url.href.includes("www.youtube.com/shorts/")) {
+        const end = url.href.split("shorts/")[1];
+        const vidUrl = `https://www.youtube.com/watch?v=${end}`;
 
-    else if (href.includes("www.tiktok.com")) {
-      const isVideo = /^https:\/\/www\.tiktok\.com\/@[^\/]+\/video\/\d+$/.test(href);
-      if (isVideo) {
-        updateTabUrl(tabId, `${href}?is_from_webapp=1`);
-      } else {
-        executeScript(tabId, () => {
-          const exists = !!document.getElementById('main-content-homepage_hot');
-          chrome.runtime.sendMessage({ foundHotContent: exists });
+        chrome.tabs.update(details.tabId, {
+          url: vidUrl
+        });
+      } else if (url.href.includes("www.tiktok.com")) {
+        const urlPattern = /^https:\/\/www\.tiktok\.com\/@[^\/]+\/video\/\d+$/;
+        if (urlPattern.test(url)) {
+          const vidUrl = `${url.href}?is_from_webapp=1`;
+          chrome.tabs.update(details.tabId, {
+            url: vidUrl
+          });
+        } else {
+          chrome.scripting.executeScript({
+            target: { tabId: details.tabId },
+            func: () => {
+              const exists = document.getElementById('main-content-homepage_hot') !== null;
+              chrome.runtime.sendMessage({ foundHotContent: exists });
+            }
+          });
+        }
+      } else if (url.href.includes("www.instagram.com/reels/")) {
+        const urlParts = url.href.split("reels");
+        const vidUrl = `${urlParts[0]}p${urlParts[1]}`;
+
+        chrome.tabs.update(details.tabId, {
+          url: vidUrl
         });
       }
     }
-
-    else if (href.includes("www.instagram.com/reels/")) {
-      const [prefix, suffix] = href.split("reels");
-      updateTabUrl(tabId, `${prefix}p${suffix}`);
-    }
   });
 
-  // Remove recommended content
   chrome.storage.sync.get("noRecommended", ({ noRecommended = [] }) => {
-    if (blockedDomains.includes(domain)) return;
-    if (href.includes("www.youtube.com")) {
+    if (url.href.includes("www.youtube.com")) {
       if (noRecommended.includes("www.youtube.com/shorts")) {
-        executeScript(tabId, removeShortsFromYouTube);
+        chrome.scripting.executeScript({
+          target: { tabId: details.tabId },
+          func: () => {
+            function removeShortsShelves() {
+              const selectorsToRemove = [
+                'ytd-reel-shelf-renderer',
+                '[class*="ytd-rich-shelf-renderer"]'
+              ];
+              selectorsToRemove.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => el.remove());
+              });
+            }
+
+            removeShortsShelves();
+
+            const observer = new MutationObserver(removeShortsShelves);
+            observer.observe(document.body, { childList: true, subtree: true });
+          }
+        });
       }
       if (noRecommended.includes("www.youtube.com")) {
-        executeScript(tabId, removeFromYouTubeRecommended);
+        chrome.scripting.executeScript({
+          target: { tabId: details.tabId },
+          func: () => {
+            function removeRecommended() {
+              document.querySelectorAll('[id*="related"]').forEach(el => el.remove());
+              if (location.hostname === "www.youtube.com" && location.pathname === "/") {
+                document.querySelectorAll('ytd-two-column-browse-results-renderer').forEach(el => el.remove());
+              }
+            }
+
+            removeRecommended();
+
+            const observer = new MutationObserver(removeRecommended);
+            observer.observe(document.body, { childList: true, subtree: true });
+          }
+        });
       }
     }
-
     if (noRecommended.includes(domain)) {
-      if (domain === "www.instagram.com" && url.pathname === "/") {
-        executeScript(tabId, removeFromInstagramHome);
-      }
-      else if (domain === "x.com") {
-        executeScript(tabId, removeFromTwitter);
+      if (url.hostname === "www.instagram.com" && url.pathname === "/") {
+        chrome.scripting.executeScript({
+          target: { tabId: details.tabId },
+          func: () => {
+            function removeExtraArticles() {
+              document.querySelectorAll('div').forEach(div => {
+                const articles = div.querySelectorAll('article');
+                if (articles.length >= 1) {
+                  articles.forEach(article => article.remove());
+                }
+              });
+            }
+
+            removeExtraArticles();
+
+            const observer = new MutationObserver(() => {
+              removeExtraArticles();
+            });
+
+            observer.observe(document.body, {
+              childList: true,
+              subtree: true
+            });
+          }
+        });
+      } else if (url.hostname === "x.com") {
+        chrome.scripting.executeScript({
+          target: { tabId: details.tabId },
+          func: () => {
+            function removeRecommended() {
+              const listsToRemove = [
+                '[aria-labelledby*="accessible-list-1"]',
+                '[aria-labelledby*="accessible-list-2"]',
+                '[aria-labelledby*="accessible-list-0"]'
+              ];
+              listsToRemove.forEach(list => {
+                document.querySelectorAll(list).forEach(el => el.remove());
+              });
+            }
+
+            removeRecommended();
+
+            const observer = new MutationObserver(removeRecommended);
+            observer.observe(document.body, { childList: true, subtree: true });
+          }
+        });
       }
     }
   });
 
-  // Only allow messaging
   chrome.storage.sync.get("onlyMessage", ({ onlyMessage = [] }) => {
-    if (!onlyMessage.includes(domain) || blockedDomains.includes(domain)) return;
-
-    if (domain === "www.instagram.com" && !url.pathname.startsWith("/direct")) {
-      updateTabUrl(tabId, "https://www.instagram.com/direct");
-    }
-
-    if (domain === "x.com" && url.pathname !== "/messages") {
-      updateTabUrl(tabId, "https://x.com/messages");
+    if (onlyMessage.includes(domain)) {
+      if (url.hostname === "www.instagram.com" && !url.pathname.startsWith("/direct")) {
+        chrome.tabs.update(details.tabId, {
+          url: "https://www.instagram.com/direct"
+        });
+      }
+      if (url.hostname === "x.com" && url.pathname !== "/messages") {
+        chrome.tabs.update(details.tabId, {
+          url: "https://x.com/messages"
+        });
+      }
     }
   });
 }
 
-// Navigation listeners
-chrome.webNavigation.onCompleted.addListener(handleMonitoring, {
+chrome.webNavigation.onCompleted.addListener(handleNavigation, {
   url: [{ schemes: ["http", "https"] }]
 });
 
-chrome.webNavigation.onHistoryStateUpdated.addListener(handleMonitoring, {
+chrome.webNavigation.onHistoryStateUpdated.addListener(handleNavigation, {
   url: [{ schemes: ["http", "https"] }]
 });
 
-// Hard reroute for TikTok
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg.foundHotContent) {
     chrome.tabs.update(sender.tab.id, {
