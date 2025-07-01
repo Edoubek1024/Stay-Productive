@@ -144,7 +144,7 @@ input:checked + .slider:before {
   background-color: #2563eb;
 }
 
-/* "X" Remove Button */
+/* Remove Button */
 .remove {
   display: flex;
   align-items: center;
