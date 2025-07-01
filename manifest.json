@@ -3,10 +3,16 @@
   "description": "Keeps you productive",
   "version": "1.0",
   "manifest_version": 3,
-  "permissions": ["tabs", "webNavigation"],
+  "permissions": [
+    "tabs", 
+    "scripting", 
+    "webNavigation", 
+    "storage",
+    "activeTab"
+  ],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "hello_extensions.png"
+    "default_icon": "assets/stay_productive.png"
   },
   "background": {
     "service_worker": "background.js"

@@ -1,10 +1,149 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Current Tab URL</title>
-  </head>
+<head>
+  <link rel="stylesheet" href="popup.css">
+</head>
   <body>
-    <h3>URL of current tab:</h3>
+    <div class="tab-buttons">
+      <button class="tab-button" data-tab="youtube">YouTube</button>
+      <button class="tab-button" data-tab="tiktok">TikTok</button>
+      <button class="tab-button" data-tab="instagram">Instagram</button>
+      <button class="tab-button" data-tab="twitter">Twitter</button>
+      <button class="tab-button" data-tab="other">Other</button>
+    </div>
+
+    <div class="tab-content" id="youtube">
+      <div class="tab-header">
+        <h2>YouTube Settings</h2>
+        <img class="tab-icon" src="assets/youtube_logo.png" alt="YouTube">
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="turn-off" data-domain="www.youtube.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Block website</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="prevent-recommended" data-domain="www.youtube.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Turn off recommended videos</span>
+      </div>
+      <h3>Just Shorts</h3>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="stop-scrolling" data-domain="www.youtube.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent scrolling</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="prevent-recommended" data-domain="www.youtube.com/shorts">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent recommended shorts</span>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tiktok">
+      <div class="tab-header">
+        <h2>TikTok Settings</h2>
+        <img class="tab-icon" src="assets/tiktok_logo.png" alt="TikTok">
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="turn-off" data-domain="www.tiktok.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Block website</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="stop-scrolling" data-domain="www.tiktok.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent scrolling</span>
+      </div>
+    </div>
+
+    <div class="tab-content" id="instagram">
+      <div class="tab-header">
+        <h2>Instagram Settings</h2>
+        <img class="tab-icon" src="assets/instagram_logo.png" alt="Instagram">
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="turn-off" data-domain="www.instagram.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Block website</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="only-message" data-domain="www.instagram.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Only messaging</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="prevent-recommended" data-domain="www.instagram.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent recommended</span>
+      </div>
+      <h3>Just Reels</h3>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="stop-scrolling" data-domain="www.instagram.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent scrolling</span>
+      </div>
+    </div>
+
+    <div class="tab-content" id="twitter">
+      <div class="tab-header">
+        <h2>Twitter Settings</h2>
+        <img class="tab-icon" src="assets/twitter_logo.png" alt="Twitter">
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="turn-off" data-domain="x.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Block website</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="only-message" data-domain="x.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Only messaging</span>
+      </div>
+      <div class="setting-row">
+        <label class="switch">
+          <input type="checkbox" class="prevent-recommended" data-domain="x.com">
+          <span class="slider round"></span>
+        </label>
+        <span>Prevent recommended</span>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="other">
+      <div class="tab-header">
+        <h2>Other Websites</h2>
+      </div>
+      <div class="setting-row">
+        <input type="text" id="custom-domain-input" placeholder="Enter URL" />
+        <button id="add-custom-domain">Block</button>
+      </div>
+      <div id="custom-block-list"></div>
+    </div>
+
     <script src="popup.js"></script>
   </body>
 </html>

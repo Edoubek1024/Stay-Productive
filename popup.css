@@ -1,0 +1,169 @@
+body {
+  width: 450px;
+  height: 300px;
+  font-family: sans-serif;
+  background: #1e1e1e;
+  color: white;
+}
+
+/* Tab Buttons */
+.tab-buttons {
+  display: flex;
+  border-bottom: 1px solid #444;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  background: #2a2a2a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-button:hover,
+.tab-button.active {
+  background: #444;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  padding: 10px;
+  position: relative;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Tab Header */
+.tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tab-header h2 {
+  margin: 0;
+  font-size: 16px;
+  flex: 1;
+}
+
+.tab-icon {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+}
+
+/* Settings Row */
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+/* Toggle Switch Style */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 22px;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* Input Field for Custom Domains */
+.setting-row input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: white;
+  outline: none;
+  font-size: 14px;
+}
+
+.setting-row input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+/* "Block" Button */
+.setting-row button {
+  padding: 8px 12px;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.setting-row button:hover {
+  background-color: #2563eb;
+}
+
+/* "X" Remove Button */
+.remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #8b0000;
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.remove input {
+  display: none;
+}
+
+.remove .x-symbol {
+  font-weight: bold;
+  pointer-events: none;
+}
