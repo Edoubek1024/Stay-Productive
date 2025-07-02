@@ -67,7 +67,8 @@ function handleNavigation(details) {
             function removeShortsShelves() {
               const selectorsToRemove = [
                 'ytd-reel-shelf-renderer',
-                '[class*="ytd-rich-shelf-renderer"]'
+                '[class*="ytd-rich-shelf-renderer"]',
+                '[class*="ytp-endscreen-content"]'
               ];
               selectorsToRemove.forEach(selector => {
                 document.querySelectorAll(selector).forEach(el => el.remove());
