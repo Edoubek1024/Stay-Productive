@@ -81,12 +81,7 @@ document.getElementById("add-custom-domain").addEventListener("click", () => {
 
   try {
     const url = new URL(rawValue.startsWith("http") ? rawValue : `https://${rawValue}`);
-    let hostname = url.hostname;
-    if (!hostname.startsWith("www.") && hostname.split('.').length === 2) {
-      hostname = "www." + hostname;
-    }
-
-    domain = hostname;
+    domain = url.hostname;
 
     if (!domain.includes('.')) {
       throw new Error("Domain invalid");
