@@ -3,12 +3,22 @@
 Stay Productive is a Chrome extension that helps you reclaim your time by blocking distracting websites and removing time-wasting features like infinite scrolling and recommended content. You can choose which platforms to filter (like YouTube, TikTok, Instagram, or Twitter) and even add your own custom sites. Stay focused with flexible, user-controlled productivity tools built right into your browser.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/089e52f6-f59f-4e54-a133-bd3bd86ae65f" width=256 />
+  <img src="https://github.com/user-attachments/assets/99150a95-d14b-4bc8-97ed-ee2939387dc3" width=300 />
 </p>
 
 # How to Install
 
-Until Stay Productive is available on the Chrome Web Store, users can install it manually by following these steps:
+## For General Use (Recommended)
+
+### 1. Add the Extension
+
+Install Stay Productive directly from the Chrome Web Store: [Stay Productive](https://chromewebstore.google.com/detail/stay-productive/jmackbcegnlbedjklmombbncnkcmpenb).
+
+### 2. Confirm Installation
+
+Confirm installation by checking that the extension appears on `chrome://extensions` or in your Extensions Menu in the top right of your Chrome browser.
+
+## For Customization
 
 ### 1. Download the Extension's Files
 
